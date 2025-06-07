@@ -68,7 +68,9 @@ export function CreateBudget(props: {user: User, budgetId: string | null}) {
   }
 
   useEffect(()=>{
-    (props.budgetId) ? budgetInit() : null
+    if (props.budgetId){
+      budgetInit()
+    }
   }, [])
     
   return(

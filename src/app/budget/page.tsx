@@ -19,7 +19,7 @@ export default function Home() {
     } else {
       console.log(`BudgetId was undefined`)
     }
-  }, [])
+  }, [budgetId])
 
   function toggleActiveBudget(){
     if (budget){
