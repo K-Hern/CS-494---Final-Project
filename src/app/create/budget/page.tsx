@@ -24,7 +24,7 @@ export default function Home() {
   );
 }
 
-export function CreateBudget(props: {user: User, budgetId: string | null}) {
+function CreateBudget(props: {user: User, budgetId: string | null}) {
   const router = useRouter();
   const [budget, setBudget] = useState<Budget>({
     id: undefined,
