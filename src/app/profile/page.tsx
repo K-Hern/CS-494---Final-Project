@@ -1,7 +1,7 @@
 'use client';
 import { useUserContext } from "@/app/context/userContext";
 import { UserInfo } from "@/types/userInfo";
-import { Avatar, Box, Button, FormControl, TextField } from "@mui/material";
+import { Avatar, Box, Button, TextField, Paper, Typography, Stack } from "@mui/material";
 import { User } from "firebase/auth";
 import { FormEvent, useState, useEffect } from "react";
 
@@ -14,7 +14,6 @@ function ProfileDetails(props: { user: User }) {
     income: 0
   });
   const empty_val: string = "None Provided";
-  const input_styling = { padding: '3px', margin: '2px' };
 
   useEffect(() => {
     initUserInfo();
@@ -50,38 +49,97 @@ function ProfileDetails(props: { user: User }) {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <Avatar
-        alt="Profile Image"
-        src={props.user.photoURL || ""}
-        sx={{ width: 200, height: 200 }}
-      />
-      <h1>{props.user.displayName}</h1>
-      <h1>{props.user.email}</h1>
-      {editMode ?
-        <Box component="form" onSubmit={handleSubmit}>
-          <FormControl>
-            <TextField variant="outlined" sx={input_styling} id="Occupation-Input" label="Occupation" name="occupation" value={userInfo.occupation} onChange={handleChange} />
-            <TextField variant="outlined" sx={input_styling} id="Organization-Input" label="Organization" name="organization" value={userInfo.organization} onChange={handleChange} />
-            <TextField variant="outlined" sx={input_styling} id="Income-Input" label="Income" name="income" value={userInfo.income} onChange={handleChange} />
-
-            <Button type="submit" variant={"contained"} sx={{ margin: 1 }} color={"info"}>Save</Button>
-            <Button variant={"contained"} sx={{ margin: 1 }} color={"info"} onClick={() => toggleEditMode(prev => !prev)}>
-              Cancel
-            </Button>
-          </FormControl>
-        </Box>
-        :
-        <div>
-          <h1>Occupation: {userInfo.occupation ? userInfo.occupation : empty_val}</h1>
-          <h1>Organization: {userInfo.organization ? userInfo.organization : empty_val}</h1>
-          <h1>Income: {userInfo.income}</h1>
-          <Button variant={"contained"} sx={{ margin: 1 }} color={"info"} onClick={() => toggleEditMode(prev => !prev)}>
-            Edit Profile
-          </Button>
-        </div>
-      }
-    </div>
+    <Box
+      sx={{
+        height: '100vh',
+        width: '100vw',
+        bgcolor: '#f5f6fa',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden'
+      }}
+    >
+      <Paper
+        elevation={4}
+        sx={{
+          p: 6,
+          maxWidth: 600,
+          width: 1,
+          borderRadius: 4,
+          boxSizing: 'border-box',
+          minHeight: 500,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <Stack spacing={4} alignItems="center" sx={{ width: '100%' }}>
+          <Avatar
+            alt="Profile Image"
+            src={props.user.photoURL || ""}
+            sx={{ width: 140, height: 140 }}
+          />
+          <Typography variant="h4" fontWeight={600}>{props.user.displayName}</Typography>
+          <Typography variant="subtitle1" color="text.secondary">{props.user.email}</Typography>
+          {editMode ? (
+            <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+              <Stack spacing={3}>
+                <TextField
+                  variant="outlined"
+                  id="Occupation-Input"
+                  label="Occupation"
+                  name="occupation"
+                  value={userInfo.occupation}
+                  onChange={handleChange}
+                  fullWidth
+                />
+                <TextField
+                  variant="outlined"
+                  id="Organization-Input"
+                  label="Organization"
+                  name="organization"
+                  value={userInfo.organization}
+                  onChange={handleChange}
+                  fullWidth
+                />
+                <TextField
+                  variant="outlined"
+                  id="Income-Input"
+                  label="Income"
+                  name="income"
+                  value={userInfo.income}
+                  onChange={handleChange}
+                  type="number"
+                  fullWidth
+                />
+                <Stack direction="row" spacing={2} justifyContent="center">
+                  <Button type="submit" variant="contained" color="info">Save</Button>
+                  <Button variant="outlined" color="info" onClick={() => toggleEditMode(prev => !prev)}>
+                    Cancel
+                  </Button>
+                </Stack>
+              </Stack>
+            </Box>
+          ) : (
+            <Stack spacing={2} alignItems="center" sx={{ width: '100%' }}>
+              <Typography variant="body1">
+                <strong>Occupation:</strong> {userInfo.occupation ? userInfo.occupation : empty_val}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Organization:</strong> {userInfo.organization ? userInfo.organization : empty_val}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Income:</strong> ${userInfo.income}
+              </Typography>
+              <Button variant="contained" color="info" onClick={() => toggleEditMode(prev => !prev)}>
+                Edit Profile
+              </Button>
+            </Stack>
+          )}
+        </Stack>
+      </Paper>
+    </Box>
   );
 }
 
@@ -89,8 +147,39 @@ export default function Home() {
   const user = useUserContext();
 
   return (
-    <div>
-      {user ? <ProfileDetails user={user} /> : <h1>You are currently not logged in, Log in to view your profile details</h1>}
-    </div>
+    <Box
+      sx={{
+        height: '100vh',
+        width: '100vw',
+        bgcolor: '#f5f6fa',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden'
+      }}
+    >
+      {user ? (
+        <ProfileDetails user={user} />
+      ) : (
+        <Paper
+          elevation={4}
+          sx={{
+            p: 6,
+            maxWidth: 600,
+            width: 1,
+            borderRadius: 4,
+            textAlign: 'center',
+            minHeight: 300,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <Typography variant="h5">
+            You are currently not logged in, Log in to view your profile details
+          </Typography>
+        </Paper>
+      )}
+    </Box>
   );
 }

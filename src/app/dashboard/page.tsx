@@ -1,5 +1,4 @@
 'use client';
-
 import { Budget } from "@/types/budget";
 import { useEffect, useState } from "react";
 import { User } from "firebase/auth";
@@ -7,19 +6,21 @@ import { useUserContext } from "@/app/context/userContext";
 import BudgetCardList from "@/components/budgetCardList";
 import BudgetsSummaryCard from "@/components/budgetsSummaryCard";
 import { UserInfo } from "@/types/userInfo";
-import { Button } from "@mui/material";
+import { Button, Container, Box, Typography, Alert, Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const user = useUserContext();
   return(
-    <div>
+    <Container maxWidth="md" sx={{ mt: 6 }}>
       {(user) ?
         <Dashboard user={user}/>
       :
-        <h1>This feature is only available to signed in users</h1>
+        <Typography variant="h5" color="text.secondary" align="center" sx={{ mt: 8 }}>
+          This feature is only available to signed in users
+        </Typography>
       } 
-    </div>
+    </Container>
   );
 }
 
@@ -38,40 +39,51 @@ function Dashboard(props: {user: User}){
     const data = await res.json();
     setBudgets(data as Budget[]);
   }
+
   async function getUserInfo(){
     const res = await fetch(`/api/users?userId=${props.user.uid}`);
     const data = await res.json();
     setUserInfo(data as UserInfo);
   }
-
-  // Half and half screen - left half summary card, right half budgets list
+  
   return (
-    <div>
+    <Box>
       {userInfo ?
-        <>
-          {userInfo.income === 0 ? (<h1>Your Income Has Not yet Been Set, <a href={`/profile`}>Complete Your Profile</a></h1>) : null}
+        <Stack spacing={4}>
+          {userInfo.income === 0 && (
+            <Alert severity="warning">
+              Your Income Has Not yet Been Set,&nbsp;
+              <a href="/profile" style={{ color: "#1976d2", textDecoration: "underline" }}>Complete Your Profile</a>
+            </Alert>
+          )}
           {budgets.length === 0 ? (
-            <>
-              <h1>No Budgets Yet</h1>
-              <Button onClick={() => router.push(`/create/budget`)} variant="contained" sx={{ margin: 1 }} color="info">
+            <Box textAlign="center" mt={6}>
+              <Typography variant="h4" gutterBottom>No Budgets Yet</Typography>
+              <Button onClick={() => router.push(`/create/budget`)} variant="contained" color="info">
                 Create
               </Button>
-            </>
+            </Box>
           ) : (
-            <>
-              <h1>My Budgets</h1>
-              {budgets.map((budget, index) =>
-                budget.active ? (
-                  <BudgetsSummaryCard key={index} budget={budget} income={userInfo.income} />
-                ) : null
-              )}
+            <Box>
+              <Typography variant="h3" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                My Budgets
+              </Typography>
+              <Stack spacing={3} mb={4}>
+                {budgets.map((budget, index) =>
+                  budget.active ? (
+                    <BudgetsSummaryCard key={index} budget={budget} income={userInfo.income} />
+                  ) : null
+                )}
+              </Stack>
               <BudgetCardList budgets={budgets} />
-            </>
+            </Box>
           )}
-        </>
+        </Stack>
       :
-        <h1>Loading...</h1>
+        <Typography variant="h5" color="text.secondary" align="center" sx={{ mt: 8 }}>
+          Loading...
+        </Typography>
       }
-    </div>
+    </Box>
   );
 }

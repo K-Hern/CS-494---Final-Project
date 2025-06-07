@@ -9,10 +9,6 @@ import { useRouter } from 'next/navigation'
 export default function BudgetCardList(props: {budgets: Budget[]}) {
   const router = useRouter();
 
-  function openBudget(budget_id: string | undefined){
-    router.push(`/budget?budgetId=${budget_id}`)  
-  }
-
   return (
     <Box
       sx={{
@@ -25,7 +21,7 @@ export default function BudgetCardList(props: {budgets: Budget[]}) {
       {props.budgets.map((budget, index) => (
         <Card key={index}>
           <CardActionArea
-            onClick={() => openBudget(budget.id)}
+            onClick={() => router.push(`/budget?budgetId=${budget.id}`) }
             sx={{
               height: '100%',
               '&[data-active]': {

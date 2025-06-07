@@ -1,8 +1,7 @@
 'use client';
-
 import { useUserContext } from "@/app/context/userContext";
 import { User } from "firebase/auth";
-import { Box, Button, FormControl, TextField } from "@mui/material";
+import { Box, Button, FormControl, TextField, Paper, Typography, Stack } from "@mui/material";
 import { FormEvent, useEffect, useState } from "react";
 import { Budget } from "@/types/budget";
 import { useRouter } from "next/navigation";
@@ -13,24 +12,25 @@ export default function Home() {
   const searchParams = useSearchParams();
   const budgetId = searchParams.get('budgetId');
   return(
-    <div>
+    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#f5f6fa' }}>
       {(user) ?
         <CreateBudget user={user} budgetId={budgetId}/>
       :
-        <h1>This feature is only available to signed in users</h1>
+        <Typography variant="h5" color="text.secondary" align="center">
+          This feature is only available to signed in users
+        </Typography>
       } 
-    </div>
+    </Box>
   );
 }
 
 export function CreateBudget(props: {user: User, budgetId: string | null}) {
   const router = useRouter();
-  const input_styling = { padding: '3px', margin: '2px' }
   const [budget, setBudget] = useState<Budget>({
     id: undefined,
     userId: props.user.uid,
-    description: "",
     name: "",
+    description: "",
     food: 0,
     housing: 0,
     retirement: 0,
@@ -61,43 +61,48 @@ export function CreateBudget(props: {user: User, budgetId: string | null}) {
     router.push("/dashboard");
   }
 
-  useEffect(()=>{
-    (props.budgetId) ? budgetInit(): null
-  }, [])
-
   async function budgetInit(){
     const res = await fetch(`/api/budget?budgetId=${props.budgetId}`);
     const data = await res.json();
     setBudget(data);
   }
+
+  useEffect(()=>{
+    (props.budgetId) ? budgetInit() : null
+  }, [])
     
   return(
-    <div>
+    <Paper elevation={4} sx={{ p: 4, maxWidth: 500, width: '100%' }}>
+      <Typography variant="h4" align="center" sx={{ mb: 3, fontWeight: 600 }}>
+        {props.budgetId ? "Edit Budget" : "Create Budget"}
+      </Typography>
       <Box component="form" onSubmit={handleSubmit}>
-        <FormControl>
-          {
-            Object.entries(budget).map(([key, value]) =>
-              (!['active', 'id', 'userId'].includes(key)) ?
-                <TextField
-                  key={key}
-                  variant="outlined"
-                  sx={input_styling}
-                  id={`${key}-Input`}
-                  name={key}
-                  label={key.charAt(0).toUpperCase() + key.slice(1)} // Insane that we have to do all this just to capitalize
-                  type={typeof value}
-                  value={value}
-                  onChange={handleChange}
-                />
-              :
-                null
-            )
-          }
-          <Button type="submit" variant="contained" sx={{ margin: 1 }} color="info">
-            Save
-          </Button>
+        <FormControl fullWidth>
+          <Stack spacing={2}>
+            {
+              Object.entries(budget).map(([key, value]) =>
+                (!['active', 'id', 'userId'].includes(key)) ?
+                  <TextField
+                    key={key}
+                    variant="outlined"
+                    id={`${key}-Input`}
+                    name={key}
+                    label={key.charAt(0).toUpperCase() + key.slice(1)}
+                    type={typeof value === "number" ? "number" : "text"}
+                    value={value}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                :
+                  null
+              )
+            }
+            <Button type="submit" variant="contained" color="info" size="large" sx={{ mt: 2 }}>
+              Save
+            </Button>
+          </Stack>
         </FormControl>
       </Box>
-    </div>
+    </Paper>
   );
 }
