@@ -3,16 +3,19 @@
 import { useUserContext } from "@/app/context/userContext";
 import { User } from "firebase/auth";
 import { Box, Button, FormControl, TextField } from "@mui/material";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Budget } from "@/types/budget";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from 'next/navigation';
 
 export default function Home() {
   const user = useUserContext();
+  const searchParams = useSearchParams();
+  const budgetId = searchParams.get('budgetId');
   return(
     <div>
       {(user) ?
-        <CreateBudget user={user} />
+        <CreateBudget user={user} budgetId={budgetId}/>
       :
         <h1>This feature is only available to signed in users</h1>
       } 
@@ -20,8 +23,9 @@ export default function Home() {
   );
 }
 
-export function CreateBudget(props: {user: User}) {
+export function CreateBudget(props: {user: User, budgetId: string | null}) {
   const router = useRouter();
+  const input_styling = { padding: '3px', margin: '2px' }
   const [budget, setBudget] = useState<Budget>({
     id: undefined,
     userId: props.user.uid,
@@ -35,9 +39,8 @@ export function CreateBudget(props: {user: User}) {
     education: 0,
     savings: 0,
     miscellaneous: 0,
+    active: false,
   });
-  
-  const input_styling = { padding: '3px', margin: '2px' }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>){
     setBudget((prev) => ({
@@ -54,113 +57,39 @@ export function CreateBudget(props: {user: User}) {
     });
     router.push("/dashboard");
   }
+
+  useEffect(()=>{
+    (props.budgetId) ? budgetInit(): null
+  }, [])
+
+  async function budgetInit(){
+    const res = await fetch(`/api/budget?budgetId=${props.budgetId}`);
+    const data = await res.json();
+    setBudget(data);
+  }
     
   return(
     <div>
       <Box component="form" onSubmit={handleSubmit}>
         <FormControl>
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="name-Input"
-            name="name"
-            label="Name"
-            type="string"
-            value={budget.name}
-            onChange={handleChange}
-          />
-
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="name-Input"
-            name="description"
-            label="Description"
-            type="string"
-            value={budget.description}
-            onChange={handleChange}
-          />
-
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="Food-Input"
-            name="food"
-            label="Food"
-            type="number"
-            value={budget.food}
-            onChange={handleChange}
-          />
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="Housing-Input"
-            name="housing"
-            label="Housing"
-            type="number"
-            value={budget.housing}
-            onChange={handleChange}
-          />
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="Retirement-Input"
-            name="retirement"
-            label="Retirement"
-            type="number"
-            value={budget.retirement}
-            onChange={handleChange}
-          />
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="Transportation-Input"
-            name="transportation"
-            label="Transportation"
-            type="number"
-            value={budget.transportation}
-            onChange={handleChange}
-          />
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="Entertainment-Input"
-            name="entertainment"
-            label="Entertainment"
-            type="number"
-            value={budget.entertainment}
-            onChange={handleChange}
-          />
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="Education-Input"
-            name="education"
-            label="Education"
-            type="number"
-            value={budget.education}
-            onChange={handleChange}
-          />
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="Savings-Input"
-            name="savings"
-            label="Savings"
-            type="number"
-            value={budget.savings}
-            onChange={handleChange}
-          />
-          <TextField
-            variant="outlined"
-            sx={input_styling}
-            id="Miscellaneous-Input"
-            name="miscellaneous"
-            label="Miscellaneous"
-            type="number"
-            value={budget.miscellaneous}
-            onChange={handleChange}
-          />
+          {
+            Object.entries(budget).map(([key, value]) =>
+              (!['active', 'id', 'userId'].includes(key)) ?
+                <TextField
+                  key={key}
+                  variant="outlined"
+                  sx={input_styling}
+                  id={`${key}-Input`}
+                  name={key}
+                  label={key.charAt(0).toUpperCase() + key.slice(1)} // Insane that we have to do all this just to capitalize
+                  type={typeof value}
+                  value={value}
+                  onChange={handleChange}
+                />
+              :
+                null
+            )
+          }
           <Button type="submit" variant="contained" sx={{ margin: 1 }} color="info">
             Save
           </Button>

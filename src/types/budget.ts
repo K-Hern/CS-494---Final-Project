@@ -11,4 +11,5 @@ export type Budget = {
   education: number;
   savings: number;
   miscellaneous: number;
+  active: boolean;
 };

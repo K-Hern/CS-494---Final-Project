@@ -1,10 +1,8 @@
 import { doc, setDoc, deleteDoc, getDoc, getDocs, where, collection, query } from "firebase/firestore";
 import { db } from './firebase';
 import { Budget } from "@/types/budget";
-import { Mortgage } from "@/types/mortgage";
 import { UserInfo } from "@/types/userInfo";
 
-const mortgageCollection = 'Mortgages';
 const budgetCollection = 'Budgets';
 const users_collection = "users";
 
@@ -16,8 +14,7 @@ export async function getUserInfo(userId: string): Promise<UserInfo>{
     uid : userId,
     occupation : "",
     organization : "",
-    linkedIn : "",
-    gitHub : ""
+    income: 0
   };
 }
 
@@ -45,7 +42,7 @@ export async function getAllBudgets(userId: string): Promise<Budget[]>{
 
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
-    budgets.push(doc.data() as Budget)
+    budgets.push({ ...(doc.data() as Budget), id: doc.id });
   });
 
   return budgets;
@@ -56,23 +53,5 @@ export async function getBudgetById(budgetId: string): Promise<Budget | null>{
   const docRef = doc(db, budgetCollection, budgetId);
   const docSnap = await getDoc(docRef);
 
-  return (docSnap.exists()) ? docSnap.data() as Budget : null;
-}
-
-// create/update a mortgage
-export async function upsertMortgage(mortgageData: Mortgage): Promise<void>{
-  await setDoc(doc(db, mortgageCollection, mortgageData.userId), mortgageData);
-}
-
-// delete a mortgage
-export async function deleteMortgage(userId: string): Promise<void>{
-  await deleteDoc(doc(db, mortgageCollection, userId));
-}
-
-// get a mortgage
-export async function getMortgage(userId: string): Promise<Mortgage | null>{
-  const docRef = doc(db, mortgageCollection, userId);
-  const docSnap = await getDoc(docRef);
-
-  return ((docSnap.exists())) ? docSnap.data() as Mortgage : null;
+  return (docSnap.exists()) ? { ...(docSnap.data() as Budget), id: docSnap.id } : null;
 }

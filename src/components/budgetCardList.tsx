@@ -4,10 +4,15 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CardActionArea from '@mui/material/CardActionArea';
 import { Budget } from '@/types/budget';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation'
 
-export default function SelectActionCard(props: {budgets: Budget[]}) {
-  const [selectedCard, setSelectedCard] = useState<string>();
+export default function BudgetCardList(props: {budgets: Budget[]}) {
+  const router = useRouter();
+
+  function openBudget(budget_id: string | undefined){
+    router.push(`/budget?budgetId=${budget_id}`)  
+  }
+
   return (
     <Box
       sx={{
@@ -20,8 +25,7 @@ export default function SelectActionCard(props: {budgets: Budget[]}) {
       {props.budgets.map((budget, index) => (
         <Card key={index}>
           <CardActionArea
-            onClick={() => setSelectedCard(budget.id)}
-            data-active={selectedCard === budget.id ? '' : undefined}
+            onClick={() => openBudget(budget.id)}
             sx={{
               height: '100%',
               '&[data-active]': {
