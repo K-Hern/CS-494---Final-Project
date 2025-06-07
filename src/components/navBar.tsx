@@ -3,6 +3,7 @@ import { AppBar, Avatar, Button, Toolbar, Typography, Stack } from "@mui/materia
 import Link from "next/link";
 import { googleSignIn, logOut, useUserContext } from "@/app/context/userContext";
 import { User } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 export default function NavBar() {
   const user = useUserContext();
@@ -20,8 +21,10 @@ export default function NavBar() {
 }
 
 function NavBarLoggedIn({ user }: { user: User }) {
+  const router = useRouter();
   function handleLogout() {
     logOut();
+    router.push('/')
   }
 
     return (
