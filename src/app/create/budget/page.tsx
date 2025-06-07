@@ -79,7 +79,7 @@ function CreateBudget(props: {user: User, budgetId: string | null}) {
     if (props.budgetId){
       budgetInit()
     }
-  })
+  }, [])
     
   return(
     <Paper elevation={4} sx={{ p: 4, maxWidth: 500, width: '100%' }}>

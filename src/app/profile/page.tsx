@@ -17,7 +17,7 @@ function ProfileDetails(props: { user: User }) {
 
   useEffect(() => {
     initUserInfo();
-  });
+  }, []);
 
   async function initUserInfo() {
     const res = await fetch(`/api/users?userId=${props.user.uid}`);

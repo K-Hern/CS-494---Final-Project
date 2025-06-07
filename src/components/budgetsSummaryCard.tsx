@@ -37,7 +37,7 @@ export default function BudgetsSummaryCard(props: {budget: Budget, income: numbe
 
   useEffect(()=>{
     totalInit()
-  })
+  }, [])
 
   return (
     <Card variant="solid" sx={{backgroundColor: (total > 0) ? 'green' : 'red'}} invertedColors>
