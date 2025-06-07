@@ -28,10 +28,6 @@ export default function BudgetsSummaryCard(props: {budget: Budget, income: numbe
     let expenses: number = 0;
     Object.entries(props.budget).forEach(([key, value]) => {
       if (!['id', 'userId', 'description', 'name', 'active'].includes(key)) {
-        console.log(`Active Key: ${key}, value is of type: ${typeof(value)}`)
-        if (typeof value === 'string') {
-          value = parseFloat(value);
-        }
         expenses += Number(value);
       }
     });

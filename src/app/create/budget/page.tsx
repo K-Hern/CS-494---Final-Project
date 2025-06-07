@@ -45,7 +45,7 @@ export function CreateBudget(props: {user: User, budgetId: string | null}) {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>){
     setBudget((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: (e.target.type) == 'number' ? Number(e.target.value) : e.target.value,
     }));
   };
   
@@ -53,6 +53,9 @@ export function CreateBudget(props: {user: User, budgetId: string | null}) {
     e.preventDefault();
     await fetch("/api/budget", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(budget),
     });
     router.push("/dashboard");
