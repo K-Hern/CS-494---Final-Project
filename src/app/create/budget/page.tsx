@@ -2,12 +2,20 @@
 import { useUserContext } from "@/app/context/userContext";
 import { User } from "firebase/auth";
 import { Box, Button, FormControl, TextField, Paper, Typography, Stack } from "@mui/material";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { Budget } from "@/types/budget";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from 'next/navigation';
 
 export default function Home() {
+  return (
+    <Suspense fallback={<Typography>Loading...</Typography>}>
+      <CreatePageContent />
+    </Suspense>
+  );
+}
+
+function CreatePageContent() {
   const user = useUserContext();
   const searchParams = useSearchParams();
   const budgetId = searchParams.get('budgetId');
@@ -71,7 +79,7 @@ function CreateBudget(props: {user: User, budgetId: string | null}) {
     if (props.budgetId){
       budgetInit()
     }
-  }, [])
+  })
     
   return(
     <Paper elevation={4} sx={{ p: 4, maxWidth: 500, width: '100%' }}>

@@ -32,7 +32,7 @@ function Dashboard(props: {user: User}){
   useEffect(() => {
     getBudgetInit()
     getUserInfo()
-  }, [])
+  })
 
   async function getBudgetInit(){
     const res = await fetch(`/api/budget/all?userId=${props.user.uid}`);
